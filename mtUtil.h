@@ -129,7 +129,7 @@ namespace mt {
 
 
     void loadColorSample( string fileName, vector<vector<Colorf>>& col){
-        Surface sur( loadImage( loadAsset(fileName) ) );
+        Surface sur( loadImage( getAssetPath()/fileName) );
         Surface::Iter itr = sur.getIter();
         
         int w = sur.getWidth();
