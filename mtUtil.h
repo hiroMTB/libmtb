@@ -1,5 +1,5 @@
 #pragma once
-
+#include <fstream>
 #include "cinder/app/AppNative.h"
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Vbo.h"
@@ -72,6 +72,12 @@ namespace mt {
     
     string getProjectName(){
         
+    }
+    
+    void saveString( string str, fs::path path ){
+        ofstream ost( path.string() );
+        ost << str;
+        ost.close();
     }
     
     float distanceToLine( const Ray &ray, const Vec3f &point){

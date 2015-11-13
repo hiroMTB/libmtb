@@ -15,7 +15,7 @@ public:
         sfinfo.samplerate = samplingRate;
         sfinfo.frames = totalFrames;
         sfinfo.channels = nCh;
-        sfinfo.format = (SF_FORMAT_WAV | SF_FORMAT_FLOAT);  /* 32 bit float data */
+        sfinfo.format = (SF_FORMAT_WAV | SF_FORMAT_PCM_24); // SF_FORMAT_FLOAT  /* 32 bit float data */
         file = sf_open(path.c_str(), SFM_WRITE, &sfinfo);
         sf_count_t frameWrote = sf_write_float(file, &data[0], data.size());
 

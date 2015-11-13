@@ -2,14 +2,16 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace mt {
 
 template <typename T>
 class SimFrame{
-    
     
 public:
     
@@ -32,27 +34,57 @@ public:
     unsigned int load_size;
     unsigned int grid_size;
     unsigned int dimension;
-    T min;
-    T max;
+    double min = numeric_limits<double>::max();
+    double max = numeric_limits<double>::min();
 
     vector<Pos> pos;
     vector< vector<T> > data;
     
-    void load( string filePath, int boxelx, int boxely, int boxelz, double range_min, double range_max, SimFrame::DATA_TYPE dtype){
-        
+    void purseMinMax( filesystem::path dataSetDir ){
+                
+        filesystem::recursive_directory_iterator itr(dataSetDir), eof;
+
+        for( ; itr!=eof; ++itr ){
+            if( itr->path().filename().string().at(0) != '.' ){
+                
+                vector<double> raw_data;
+                loadBin( itr->path().string(), raw_data );
+                
+                double file_min = numeric_limits<double>::max();
+                double file_max = numeric_limits<double>::min();
+                
+                for( auto d : raw_data ){
+                    file_min = std::min( file_min, d );
+                    file_max = std::max( file_max, d );
+                }
+                //format fmt1("min: %1%,  max: %2%");
+                //fmt1 % file_min % file_max;
+                //cout << fmt1.str() << endl;
+                
+                // min/max value through all file in this dir
+                min = std::min( min, file_min );
+                max = std::max( max, file_max );
+                //return;
+            }
+        }
+    
+        format fmt2("data set min: %1%,  max: %2%");
+        fmt2 % min % max;
+        cout << fmt2.str() << endl;
+    }
+    
+    void load( string filePath, int boxelx, int boxely, int boxelz, double range_min, double range_max, SimFrame::DATA_TYPE dtype ){
+
         data_type = dtype;
+
+        pos.clear();
+        data.clear();
+        
         vector<double> raw_data;
         loadBin( filePath, raw_data );
+        
         total_size = raw_data.size();
 
-        min = std::numeric_limits<double>::max();
-        max = std::numeric_limits<double>::min();
-        
-        for( auto r : raw_data ){
-            min = MIN( min, r);
-            max = MAX( max, r);
-        }
-        
         grid_size = boxelx * boxely * boxelz;
         if( total_size == grid_size ){
             dimension = 1;
@@ -114,19 +146,17 @@ public:
         load_size = raw_data.size();
         cout << "Particle Visible/Total : " << load_size << "/" << total_size << endl;
         cout << "Visible Rate           : " << (float)load_size/total_size*100.0f << endl;
-        cout << "min                    : " << min << endl;
-        cout << "max                    : " << max << endl << endl;
     }
     
 private:
 
     void loadBin( string filePath, vector<double> & raw_data){
         
-        cout << "\nloading binary file : " << filePath << endl;
+        cout << "loading bin : " << filePath << endl;
         
         std::ifstream is( filePath, std::ios::binary );
         if(is){
-            cout << "load OK Bin file" << endl;
+           // cout << "load OK Bin file" << endl;
         }else{
             cout << "load ERROR Bin file" << endl;
             return;
@@ -135,15 +165,14 @@ private:
         // get length of file:
         is.seekg (0, is.end);
         int fileSize = is.tellg();
-        cout << "length : " << fileSize << " byte" << endl;
+        //cout << "length : " << fileSize << " byte" << endl;
         is.seekg (0, is.beg);
         
         unsigned int nRawData = fileSize / sizeof(double);  // 1D : 400*400*400 = 64,000,000
         raw_data.assign(nRawData, double(0));
         is.read(reinterpret_cast<char*>(&raw_data[0]), fileSize);
         is.close();
-        cout << "Load : " << nRawData << " double number" << endl;
-        cout << "Close binary file " << endl;
+        //cout << "Load : " << nRawData << " double number" << endl;
     }
     
  
