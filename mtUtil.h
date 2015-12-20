@@ -156,4 +156,17 @@ namespace mt {
         }
         cout << "ColorSample Load Success: w:" << w << ", h " << h << endl;
     }
+    
+    
+    clock_t timer;
+    void timer_start(){
+        timer = clock();
+    }
+    
+    
+    void timer_end(){
+        double elapsedSec = clock() - timer;
+        elapsedSec /= CLOCKS_PER_SEC;
+        cout << "Elapsed time(sec) : "  <<  elapsedSec << endl;
+    }
 }
