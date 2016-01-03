@@ -2,8 +2,13 @@
 
 #include "tbb/parallel_for.h"
 #include "tbb/blocked_range.h"
+#include "cinder/app/AppNative.h"
+#include "cinder/Perlin.h"
 
 using namespace tbb;
+using namespace ci;
+using namespace ci::app;
+using namespace std;
 
 class TbbNpFinder{
     
@@ -32,6 +37,7 @@ private:
         int total_size;
         int num_line;
         int num_dupl;
+        Perlin pln;
         
         // input = all point
         // output = all point * 10
@@ -52,10 +58,12 @@ private:
                     near_p.insert( pair1 );
                 }
                 
+                float noise = pln.noise(i*0.001, pos1.x*0.01, pos1.y*0.01);
+                
                 //int try_num = 6000;
-                int try_num = total_size;
-                float fLimit = 1000000;
-                float nLimit = randFloat(0.1f, 5.0f);
+                int try_num = total_size*0.3;
+                float fLimit = 5.0f + (noise*noise)*200;
+                float nLimit = 5;
 
                 for( int j=i+1; j<try_num; j++ ){
                     

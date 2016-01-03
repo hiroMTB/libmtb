@@ -24,4 +24,6 @@ public:
 
     cv::Mat input;
     cv::Mat thresh;
+    
+    int width, height;
 };

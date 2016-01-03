@@ -23,6 +23,10 @@ public:
     string snapFileName;
     Exporter(){}
     
+    void clear(){
+        mFbo.reset();
+    }
+    
     void setup( int width, int height, int exitFrame, GLenum colorInternalFormat, fs::path path, int aaSample, bool aFlip=false ){
         bRender = false;
         bSnap = false;
@@ -50,15 +54,33 @@ public:
         cout << ss.str() << endl;
     }
     
-    void begin(){
-        gl::pushMatrices();
-        //gl::SaveFramebufferBinding bindingSaver;
-        gl::setViewport( mFbo.getBounds() );
+    void beginPersp(){
         
+        int w = mFbo.getWidth();
+        int h = mFbo.getHeight();
+
+        gl::pushMatrices();
+        glViewport( 0, 0, w, h );
+
+        mFbo.bindFramebuffer();
+
+        cinder::CameraPersp cam( w, h, 60.0f );
+        
+        glMatrixMode( GL_PROJECTION );
+        glLoadMatrixf( cam.getProjectionMatrix().m );
+        
+        glMatrixMode( GL_MODELVIEW );
+        glLoadMatrixf( cam.getModelViewMatrix().m );
+        //glScalef( 1.0f, -1.0f, 1.0f );
+        //glTranslatef( 0.0f, (float)-h, 0.0f );
+    }
+
+    void beginOrtho(){
+        gl::setViewport( mFbo.getBounds() );
         mFbo.bindFramebuffer();
         gl::setMatricesWindow( mFbo.getSize() );
         gl::scale(1,-1,1);
-        gl::translate( 0, -mFbo.getHeight() );
+        gl::translate( 0, -mFbo.getHeight() );        
     }
     
     void begin( const Camera & cam){

@@ -19,6 +19,9 @@ void ContourMap::setImage( ci::Surface32f sur, bool convert2gray=true, cv::Size 
         cv::cvtColor( input, input, CV_RGB2GRAY );
     
     cv::blur( input, input, blurSize );
+    
+    width = sur.getWidth();
+    height = sur.getHeight();
 }
 
 void ContourMap::addContour( float threshold, int filterType, bool output_threshold_image ){
@@ -106,6 +109,9 @@ void ContourMap::addContour( float threshold, int filterType, bool output_thresh
                     }
                 }
             }
+                break;
+                
+            case 3:
                 break;
 
         }
