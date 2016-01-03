@@ -121,6 +121,10 @@ public:
     
     gl::VboMesh mDot;
     gl::VboMesh mLine;
+    
+    //vector<Vec3d> mPos;
+    //vector<Vec3d> mCol;
+    
     float       mThreshold;
     
 };

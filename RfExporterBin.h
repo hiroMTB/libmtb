@@ -15,7 +15,7 @@ class RfExporterBin{
     
 public:
     
-    void write( string fileName, const vector<float> &position, const vector<float> &velocity ){
+    void write( string fileName, const vector<float> &position, const vector<float> &velocity, const vector<float> &mass ){
 
         FILE * pFile;
         int     verificationCode = 0xFABADA;
@@ -67,10 +67,10 @@ public:
             short pInfoBit       = 0;
             float pElapsedTime   = 0.0f;
             float pIsoTime       = 0.0f;
-            float pViscosity     = 3.0f;
+            float pViscosity     = 0.0f;
             float pDensity       = 539;
             float pPressure      = -1000.0f;
-            float pMass          = 1.0f;
+            float pMass          = mass.size()==0 ? 1 : mass[i];
             float pTemperature   = 300.0f;
             int   pId            = numParticles - i;
             
