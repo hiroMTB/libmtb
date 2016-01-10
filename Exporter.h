@@ -76,11 +76,12 @@ public:
     }
 
     void beginOrtho(){
+        gl::pushMatrices();
         gl::setViewport( mFbo.getBounds() );
         mFbo.bindFramebuffer();
         gl::setMatricesWindow( mFbo.getSize() );
         gl::scale(1,-1,1);
-        gl::translate( 0, -mFbo.getHeight() );        
+        gl::translate( 0, -mFbo.getHeight() );
     }
     
     void begin( const Camera & cam){
@@ -135,6 +136,8 @@ public:
     }
     
     void draw(){
+        gl::clear();
+        glColor3f(1, 1, 1);
         gl::pushMatrices();
         gl::setMatricesWindow( mFbo.getSize() );
         gl::setViewport(getWindowBounds() );

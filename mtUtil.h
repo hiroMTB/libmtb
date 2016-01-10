@@ -116,7 +116,6 @@ namespace mt {
         } glEnd();
     }
   
-    
     void drawScreenGuide(){
 
         float w = getWindowWidth();
@@ -132,7 +131,6 @@ namespace mt {
         } glEnd();
         gl::popMatrices();
     }
-
 
     void loadColorSample( string fileName, vector<vector<Colorf>>& col){
         Surface sur( loadImage( getAssetPath()/fileName) );
@@ -156,13 +154,11 @@ namespace mt {
         }
         cout << "ColorSample Load Success: w:" << w << ", h " << h << endl;
     }
-    
-    
+
     clock_t timer;
     void timer_start(){
         timer = clock();
     }
-    
     
     void timer_end(){
         double elapsedSec = clock() - timer;

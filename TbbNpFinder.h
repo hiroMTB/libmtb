@@ -14,7 +14,7 @@ class TbbNpFinder{
     
 public:
     
-    void findNearestPoints( const Vec3f * input, Vec3f * output, ColorAf * in_colors, ColorAf * out_colors, size_t n, int num_line, int num_dupl ){
+    void findNearestPoints( const Vec3f * input, Vec3f * output, const ColorAf * in_colors, ColorAf * out_colors, size_t n, int num_line, int num_dupl ){
         NearestPoints np;
         np.input = input;
         np.output = output;
@@ -31,7 +31,7 @@ private:
     struct NearestPoints {
         const Vec3f *input;
         Vec3f *output;
-        ColorAf * in_colors;
+        const ColorAf * in_colors;
         ColorAf * out_colors;
         
         int total_size;
