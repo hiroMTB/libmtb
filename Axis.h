@@ -23,49 +23,23 @@ class Axis{
     
 public:
     
-    
-    Axis( float _start, float _height )
-    :
-    start(_start),
-    height(_height),
-    end(start + length),
-    center(start - length*0.5)
-    {
-        cout << "Axis : st:" << start << " - end:" << end << " L:" << length << ", sp:" << speed_max << ", acl = " << accel_max << endl;
-    }
-
-    void draw(){
-        glColor3f( 0,1,0 );
-        gl::drawSolidRect( Rectf( start, height-3, end, height+2) );
-    }
- 
-    void move( float _dest ){
+    void update( int frame ){
+        past_pos = pos;
+        past_speed = speed;
+        past_accel = accel;
         
-        dest = _dest;
-        pos_p = pos;
-        speed_p = speed;
-        accel_p = accel;
-
-        // motion pattern calculation
-        float L = dest - pos;
-        float Vmax = sqrt( L*accel_max );
-        bool triangle = Vmax <= speed_max;
-        float Vr = triangle ? Vmax : speed_max;
-        float Ta = Vr / accel_max;
-        float La = accel_max * Ta * Ta / 2;
-        float Tr = triangle ? 2*Ta : Ta+L/Vr;
-        
-        accel = speed - speed_p;
-        speed = pos - pos_p;
-        pos = 123;
+        pos   = animPos[frame];
+        speed = abs( pos.x - past_pos.x);
+        accel = abs( speed - past_speed );
+        power = animPower[frame];
     }
     
+
     void check(){
-        
-        if( pos<0 || length<pos ){
+        if( pos.x<left.x || (left.x+length)<pos.x ){
             cout << "Axis error : position over" << endl;
         }
-            
+        
         if( abs(speed) > speed_max ){
             cout << "Axis error : speed over" << endl;
         }
@@ -75,37 +49,24 @@ public:
         }
     }
     
-    // pixel
-    const int fps         = 25;
-    const float mmPerPix  = 18000.0f / 4320.0;
-    const float length    = 5000.0 / mmPerPix;          //  5m     1200 pix
-    const float speed_max = 9000.0 / mmPerPix / fps;    //  9m/s
-    const float accel_max = 40000.0 / mmPerPix / fps;   // 40m/s2
-    const float start;
-    const float end;
-    const float center;
-    const float height;
-
-    bool  isMoving  = false;
-    float speed     = 0;
-    float accel     = 0;
-    float pos       = 0;
-    float speed_p   = 0;
-    float accel_p   = 0;
-    float pos_p     = 0;
-    float dest;
+    const int    fps       = 25;
+    const double mmPerPix  = 18000.0 / 4320.0;           // 4.1666mm per pixel
+    const double speed_max = 9000.0 / mmPerPix / fps;    //  9m/s,  86.4 pix/frame
+    const double accel_max = 40000.0 / mmPerPix / fps;   // 40m/s2, 384 pix/fra,e
+    const double length    = 5000.0 / mmPerPix;          // 1200px
     
+    Vec2f pos, past_pos;     // world coord, pix
+    Vec2f left;              // world coord, pix, left position of rail
+    
+    float speed, past_speed; // pix, x speed
+    float accel, past_accel; // pix, x accel
+    
+    unsigned int power;  // DMX value, 0-255
+    
+    vector<Vec2f> animPos;
+    vector<unsigned int> animPower;
+
 };
 
 
-    vector<vector<Axis>> axes{
-        { Axis(480,192), Axis(840,576), Axis(120,960), Axis(840,1344), Axis(480,1728) },
-        { Axis(2640,192), Axis(2280,576), Axis(3000,960), Axis(2280,1344), Axis(2640,1728) }
-    };
-
-    void drawAxes(){
-        for( auto a: axes )
-            for( auto aa : a )
-                aa.draw();
-    }
 }
