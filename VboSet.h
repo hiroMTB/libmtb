@@ -54,10 +54,10 @@ public:
     inline void writeCol( int where, const ColorAf & c)  { col[where] = c; bNeedUpdateCol=true; }
     inline void writeInd( int where, const uint32_t & i) { ind[where] = i; bNeedUpdateInd=true; }
     
-    void init( GLenum primitiveType, bool bStaticPos=true, bool bStaticCol=true, bool bStaticInd=true ){
+    void init( GLenum primitiveType, bool bStaticPos=true, bool bStaticCol=true ){
         bStaticPos ? lay.setStaticPositions()   : lay.setDynamicPositions();
         bStaticCol ? lay.setStaticColorsRGBA()  : lay.setDynamicColorsRGBA();
-        bStaticInd ? lay.setStaticIndices()     : lay.setDynamicIndices();
+        //bStaticInd ? lay.setStaticIndices()     : lay.setDynamicIndices();
         vbo = gl::VboMesh::create( pos.size(), ind.size(), lay, primitiveType );
         updateVboPos();
         updateVboCol();
