@@ -17,6 +17,7 @@ public:
     bool bSnap;
     int mFrame;
     int mExitFrame;
+    string filename_prefix;
     gl::Fbo mFbo;
     fs::path mRenderPath;
     ImageTarget::Options mImgWOption;
@@ -27,11 +28,12 @@ public:
         mFbo.reset();
     }
     
-    void setup( int width, int height, int exitFrame, GLenum colorInternalFormat, fs::path path, int aaSample, bool aFlip=false ){
+    void setup( int width, int height, int startFrame, int exitFrame, GLenum colorInternalFormat, fs::path path, int aaSample, string prefix="f_", bool aFlip=false ){
         bRender = false;
         bSnap = false;
-        mFrame = 1;
+        mFrame = startFrame;
         mExitFrame = exitFrame;
+        filename_prefix = prefix;
         gl::Fbo::Format format;
         format.enableDepthBuffer( false );
         format.enableMipmapping( false );
@@ -54,41 +56,27 @@ public:
         cout << ss.str() << endl;
     }
     
-    void beginPersp(){
-        
+    void beginPersp( float fov=60.0f, float near=1.0f, float far=10000.0f){
         int w = mFbo.getWidth();
         int h = mFbo.getHeight();
-
         gl::pushMatrices();
         glViewport( 0, 0, w, h );
-
         mFbo.bindFramebuffer();
-
-        cinder::CameraPersp cam( w, h, 60.0f );
-        
-        glMatrixMode( GL_PROJECTION );
-        glLoadMatrixf( cam.getProjectionMatrix().m );
-        
-        glMatrixMode( GL_MODELVIEW );
-        glLoadMatrixf( cam.getModelViewMatrix().m );
-        //glScalef( 1.0f, -1.0f, 1.0f );
-        //glTranslatef( 0.0f, (float)-h, 0.0f );
+        gl::setMatricesWindowPersp( w, h, fov, near, far, false );
     }
 
     void beginOrtho(){
+        int w = mFbo.getWidth();
+        int h = mFbo.getHeight();
         gl::pushMatrices();
-        gl::setViewport( mFbo.getBounds() );
+        glViewport( 0, 0, w, h );
         mFbo.bindFramebuffer();
-        gl::setMatricesWindow( mFbo.getSize() );
-        gl::scale(1,-1,1);
-        gl::translate( 0, -mFbo.getHeight() );
+        gl::setMatricesWindow( w, h, false );
     }
     
     void begin( const Camera & cam){
         gl::pushMatrices();
-        //gl::SaveFramebufferBinding bindingSaver;
         gl::setViewport( mFbo.getBounds() );
-        
         mFbo.bindFramebuffer();
         gl::setMatrices( cam );
     }
@@ -98,19 +86,22 @@ public:
         gl::popMatrices();
         
         if( bRender || bSnap ){
-            string frame_name = "f_" + toString( mFrame ) + ".png";
+            
+            stringstream ss;
+            ss << std::setfill('0') << std::setw(5) << mFrame;
+            string frame_name = filename_prefix + ss.str() + ".png";
 
             if( bSnap && snapFileName!=""){
                 frame_name = snapFileName;
             }
             writeImage( mRenderPath/frame_name,  mFbo.getTexture());
-            cout << "Render Image : " << mFrame << endl;
+            cout << "Render Image : " << frame_name << endl;
             
             if( mExitFrame <= mFrame ){
                 if( bSnap ){
                     cout << "Finish Snapshot " << frame_name << endl;
                 }else{
-                    cout << "Finish Rendering " << mFrame << " frames" << endl;
+                    cout << "Finish Rendering at " << mFrame << " frames" << endl;
                     exit(1);
                 }
             }
@@ -122,12 +113,16 @@ public:
     
     void startRender(){
         bRender = true;
-        mFrame = 1;
     }
-    
+
+    void startRenderFrom( int aFrame ){
+        bRender = true;
+        mFrame = aFrame;
+    }
+
     void stopRender(){
         bRender = false;
-        cout << "Stop Render : f_" << mFrame << endl;
+        cout << "Stop Render at " << mFrame << endl;
     }
     
     void snapShot( string fileName=""){
@@ -140,7 +135,7 @@ public:
         glColor3f(1, 1, 1);
         gl::pushMatrices();
         gl::setMatricesWindow( mFbo.getSize() );
-        gl::setViewport(getWindowBounds() );
+        gl::setViewport( getWindowBounds() );
         gl::draw( mFbo.getTexture() );
         gl::popMatrices();
     }
