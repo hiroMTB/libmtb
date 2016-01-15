@@ -71,7 +71,9 @@ public:
         gl::pushMatrices();
         glViewport( 0, 0, w, h );
         mFbo.bindFramebuffer();
-        gl::setMatricesWindow( w, h, false );
+        //gl::setMatricesWindow( w, h, false );
+        CameraOrtho camo(0,w,h,0,-10000,10000);
+        gl::setMatrices( camo );
     }
     
     void begin( const Camera & cam){
@@ -109,6 +111,10 @@ public:
             bSnap = false;
             mFrame++;
         }
+    }
+    
+    void setFrame( int aFrame ){
+        mFrame = aFrame;
     }
     
     void startRender(){

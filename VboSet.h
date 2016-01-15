@@ -58,6 +58,7 @@ public:
         bStaticPos ? lay.setStaticPositions()   : lay.setDynamicPositions();
         bStaticCol ? lay.setStaticColorsRGBA()  : lay.setDynamicColorsRGBA();
         //bStaticInd ? lay.setStaticIndices()     : lay.setDynamicIndices();
+        lay.setStaticIndices();
         vbo = gl::VboMesh::create( pos.size(), ind.size(), lay, primitiveType );
         updateVboPos();
         updateVboCol();

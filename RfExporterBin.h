@@ -92,7 +92,7 @@ public:
             fwrite( &pId,           sizeof(int),        1,  pFile );
         }
         
-        // Footor
+        // Footer
         int additioanl_data_per_particle = 0;
         bool RF4_internal_data = 0;
         bool RF5_internal_data = 1;

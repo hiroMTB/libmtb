@@ -26,7 +26,8 @@ namespace mt {
         tm local;
         time(&curr);
         local =*(localtime(&curr));
-        return local.tm_gmtoff;
+        //return local.tm_gmtoff;
+        return local.tm_sec + local.tm_min;
     }
     
     string getTimeStamp(){        
