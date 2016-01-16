@@ -85,9 +85,6 @@ namespace mt {
         return expandPath("../../../");
     }
     
-    string getProjectName(){
-        
-    }
     
     void saveString( string str, fs::path path ){
         ofstream ost( path.string() );
