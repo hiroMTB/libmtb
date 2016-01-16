@@ -28,7 +28,7 @@ public:
         mFbo.reset();
     }
     
-    void setup( int width, int height, int startFrame, int exitFrame, GLenum colorInternalFormat, fs::path path, int aaSample, string prefix="f_", bool aFlip=false ){
+    void setup( int width, int height, int startFrame, int exitFrame, GLenum colorInternalFormat, fs::path path, int aaSample=0, string prefix="f_", bool aFlip=false ){
         bRender = false;
         bSnap = false;
         mFrame = startFrame;
