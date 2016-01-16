@@ -4,6 +4,7 @@
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Vbo.h"
 #include "cinder/Utilities.h"
+#include "cinder/Xml.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -12,6 +13,8 @@ using namespace std;
 typedef std::function<float (float)> EaseFunc;
 
 namespace mt {
+    
+    fs::path assetDir;
     
     gl::VboMesh::Layout getVboLayout(){
         gl::VboMesh::Layout layout;
@@ -57,7 +60,18 @@ namespace mt {
     }
     
     fs::path getAssetPath(){
-        return expandPath("../../../../../assets");
+        if( assetDir.string()=="" ){
+            XmlTree xml( loadFile(expandPath("../../../../_project_settings.xml")) );
+            XmlTree ast = xml.getChild("project_settings").getChild("assetDir");
+            string st = ast.getValue<string>("error");
+            if( st == "error"){
+                assetDir = expandPath("../../../../../assets");
+                //return fs::path("/Volumes/StudioRK_node/n5/assets");
+            }else{
+                assetDir = st;
+            }
+        }
+        return assetDir;
     }
     
     fs::path getRenderPath( string subdir_name="" ){
@@ -162,8 +176,7 @@ namespace mt {
     }
     
     void timer_end(){
-        double elapsedSec = clock() - timer;
-        elapsedSec /= CLOCKS_PER_SEC;
-        cout << "Elapsed time(sec) : "  <<  elapsedSec << endl;
+        double elapsed_sec = ((double)(clock() - timer)/CLOCKS_PER_SEC) * 1000.0 * 0.1; // dont know why but need *0.1
+        cout << "Elapsed time : "  << elapsed_sec << " ms" << endl;
     }
 }
