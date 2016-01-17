@@ -65,10 +65,12 @@ namespace mt {
             XmlTree ast = xml.getChild("project_settings").getChild("assetDir");
             string st = ast.getValue<string>("error");
             if( st == "error"){
-                assetDir = expandPath("../../../../../assets");
+                //assetDir = expandPath("../../../../../assets");
                 //return fs::path("/Volumes/StudioRK_node/n5/assets");
+                printf( "Cant find assetDir, check you have _project_settings.xml\n" );
             }else{
                 assetDir = st;
+                printf( "assetDir \"%s\"\n", st.c_str() );
             }
         }
         return assetDir;
