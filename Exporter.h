@@ -71,7 +71,9 @@ public:
         gl::pushMatrices();
         glViewport( 0, 0, w, h );
         mFbo.bindFramebuffer();
-        gl::setMatricesWindow( w, h, false );
+        CameraOrtho ocam(-w/2, w/2, h/2, -h/2, 1, 1000000);
+        gl::setMatrices(ocam);
+        //gl::setMatricesWindow( w, h, false );
     }
     
     void begin( const Camera & cam){
