@@ -64,16 +64,14 @@ public:
         mFbo.bindFramebuffer();
         gl::setMatricesWindowPersp( w, h, fov, near, far, false );
     }
-
-    void beginOrtho(){
+    
+    void beginOrtho( bool center=false){
         int w = mFbo.getWidth();
         int h = mFbo.getHeight();
         gl::pushMatrices();
         glViewport( 0, 0, w, h );
         mFbo.bindFramebuffer();
-        CameraOrtho ocam(-w/2, w/2, h/2, -h/2, 1, 1000000);
-        gl::setMatrices(ocam);
-        //gl::setMatricesWindow( w, h, false );
+        mt::setMatricesWindow( w, h, center, false, -1000.0f, 1000.0f);
     }
     
     void begin( const Camera & cam){

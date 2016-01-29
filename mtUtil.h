@@ -178,4 +178,24 @@ namespace mt {
         double elapsed_sec = ((double)(clock() - timer)/CLOCKS_PER_SEC) * 1000.0 * 0.1; // dont know why but need *0.1
         cout << "Elapsed time : "  << elapsed_sec << " ms" << endl;
     }
+    
+    
+    void setMatricesWindow( int screenWidth, int screenHeight, bool center, bool originUpperLeft=true, float near=-10000.0f, float far=10000.0f ){
+        glMatrixMode( GL_PROJECTION );
+        glLoadIdentity();
+        
+        if( originUpperLeft ){
+            if( center )
+                glOrtho( -screenWidth/2, screenWidth/2, screenHeight/2, -screenHeight/2, near, far );
+            else
+                glOrtho( 0, screenWidth, screenHeight, 0, near, far );            
+        }else{
+            if(center)
+                glOrtho( -screenWidth/2, screenWidth/2, -screenHeight/2, screenHeight/2, near, far );
+            else
+                glOrtho( 0, screenWidth, 0, screenHeight, near, far );
+        }
+        glMatrixMode( GL_MODELVIEW );
+        glLoadIdentity();
+    }
 }
