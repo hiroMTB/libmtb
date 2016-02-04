@@ -1,10 +1,12 @@
 #pragma once
+
 #include <fstream>
 #include "cinder/app/AppNative.h"
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Vbo.h"
 #include "cinder/Utilities.h"
 #include "cinder/Xml.h"
+#include "CoreFoundation/CoreFoundation.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -61,7 +63,8 @@ namespace mt {
     
     fs::path getAssetPath(){
         if( assetDir.string()=="" ){
-            XmlTree xml( loadFile(expandPath("../../../../_project_settings.xml")) );
+            fs::path app = getAppPath();
+            XmlTree xml( loadFile(expandPath(app/"../../../../../_project_settings.xml")) );
             XmlTree ast = xml.getChild("project_settings").getChild("assetDir");
             string st = ast.getValue<string>("error");
             if( st == "error"){
@@ -77,17 +80,13 @@ namespace mt {
     }
     
     fs::path getRenderPath( string subdir_name="" ){
+        fs::path app = getAppPath();
         if(subdir_name!="")
-            return expandPath("../../../../_rtmp") / getTimeStamp() / subdir_name ;
+            return expandPath(app/"../../../../../_rtmp") / getTimeStamp() / subdir_name ;
         else
-            return expandPath("../../../../_rtmp") / getTimeStamp();
+            return expandPath(app/"../../../../../_rtmp") / getTimeStamp();
     }
-    
-    fs::path getProjectPath(){
-        return expandPath("../../../");
-    }
-    
-    
+        
     void saveString( string str, fs::path path ){
         ofstream ost( path.string() );
         ost << str;
@@ -179,7 +178,6 @@ namespace mt {
         cout << "Elapsed time : "  << elapsed_sec << " ms" << endl;
     }
     
-    
     void setMatricesWindow( int screenWidth, int screenHeight, bool center, bool originUpperLeft=true, float near=-10000.0f, float far=10000.0f ){
         glMatrixMode( GL_PROJECTION );
         glLoadIdentity();
@@ -198,4 +196,19 @@ namespace mt {
         glMatrixMode( GL_MODELVIEW );
         glLoadIdentity();
     }
+    
+    string getResorcePath(){
+        CFBundleRef mainBundle = CFBundleGetMainBundle();
+        CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+        char path[PATH_MAX];
+        if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
+        {
+            // error!
+        }
+        CFRelease(resourcesURL);
+        
+        chdir(path);
+        return string(path);
+    }
+    
 }
