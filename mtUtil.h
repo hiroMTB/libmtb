@@ -6,7 +6,6 @@
 #include "cinder/gl/Vbo.h"
 #include "cinder/Utilities.h"
 #include "cinder/Xml.h"
-#include "CoreFoundation/CoreFoundation.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -196,19 +195,4 @@ namespace mt {
         glMatrixMode( GL_MODELVIEW );
         glLoadIdentity();
     }
-    
-    string getResorcePath(){
-        CFBundleRef mainBundle = CFBundleGetMainBundle();
-        CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
-        char path[PATH_MAX];
-        if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
-        {
-            // error!
-        }
-        CFRelease(resourcesURL);
-        
-        chdir(path);
-        return string(path);
-    }
-    
 }
