@@ -195,4 +195,48 @@ namespace mt {
         glMatrixMode( GL_MODELVIEW );
         glLoadIdentity();
     }
+    
+    void drawCube( float size ){
+        
+        size *= 0.5;
+        
+        glBegin(GL_QUADS);
+        // Top face (y = size)
+        // Define vertices in counter-clockwise (CCW) order with normal pointing out
+        glVertex3f( size, size, -size);
+        glVertex3f(-size, size, -size);
+        glVertex3f(-size, size,  size);
+        glVertex3f( size, size,  size);
+        
+        // Bottom face (y = -size)
+        glVertex3f( size, -size,  size);
+        glVertex3f(-size, -size,  size);
+        glVertex3f(-size, -size, -size);
+        glVertex3f( size, -size, -size);
+        
+        // Front face  (z = size)
+        glVertex3f( size,  size, size);
+        glVertex3f(-size,  size, size);
+        glVertex3f(-size, -size, size);
+        glVertex3f( size, -size, size);
+        
+        // Back face (z = -size)
+        glVertex3f( size, -size, -size);
+        glVertex3f(-size, -size, -size);
+        glVertex3f(-size,  size, -size);
+        glVertex3f( size,  size, -size);
+        
+        // Left face (x = -size)
+        glVertex3f(-size,  size,  size);
+        glVertex3f(-size,  size, -size);
+        glVertex3f(-size, -size, -size);
+        glVertex3f(-size, -size,  size);
+        
+        // Right face (x = size)
+        glVertex3f(size,  size, -size);
+        glVertex3f(size,  size,  size);
+        glVertex3f(size, -size,  size);
+        glVertex3f(size, -size, -size);
+        glEnd();  // End of drawing color-cube
+    }
 }
