@@ -26,6 +26,8 @@ using namespace std;
 class VboSet{
 
 private:
+    GLenum primitiveType;
+    
     bool bNeedUpdatePos = false;
     bool bNeedUpdateCol = false;
     bool bNeedUpdateInd = false;
@@ -35,6 +37,7 @@ private:
     vector<uint32_t>    ind;
 
 public:
+    bool bUseVbo = false;
     
     gl::VboMeshRef      vbo;
     gl::VboMesh::Layout lay;
@@ -54,58 +57,82 @@ public:
     inline void writeCol( int where, const ColorAf & c)  { col[where] = c; bNeedUpdateCol=true; }
     inline void writeInd( int where, const uint32_t & i) { ind[where] = i; bNeedUpdateInd=true; }
     
-    void init( GLenum primitiveType, bool bStaticPos=true, bool bStaticCol=true ){
-        bStaticPos ? lay.setStaticPositions()   : lay.setDynamicPositions();
-        bStaticCol ? lay.setStaticColorsRGBA()  : lay.setDynamicColorsRGBA();
-        //bStaticInd ? lay.setStaticIndices()     : lay.setDynamicIndices();
-        lay.setStaticIndices();
-        vbo = gl::VboMesh::create( pos.size(), ind.size(), lay, primitiveType );
-        updateVboPos();
-        updateVboCol();
-        updateVboInd();
+    void init( GLenum _primitiveType, bool bStaticPos=true, bool bStaticCol=true ){
+        
+        primitiveType = _primitiveType;
+        
+        if(bUseVbo){
+            bStaticPos ? lay.setStaticPositions()   : lay.setDynamicPositions();
+            bStaticCol ? lay.setStaticColorsRGBA()  : lay.setDynamicColorsRGBA();
+            //bStaticInd ? lay.setStaticIndices()     : lay.setDynamicIndices();
+            lay.setStaticIndices();
+            vbo = gl::VboMesh::create( pos.size(), ind.size(), lay, primitiveType );
+            updateVboPos();
+            updateVboCol();
+            updateVboInd();
+        }
     }
     
     void updateVboPos(){
-        if( bNeedUpdatePos && vbo ){
-            
-            if( lay.hasStaticPositions() ) {
-                vbo->bufferPositions( pos );
-            }else{
-                gl::VboMesh::VertexIter itr = vbo->mapVertexBuffer();
-                for( int i=0; !itr.isDone()&&i<pos.size(); i++ ){
-                    itr.setPosition( pos[i] );
-                    ++itr;
+        if(bUseVbo){
+            if( bNeedUpdatePos && vbo ){
+                
+                if( lay.hasStaticPositions() ) {
+                    vbo->bufferPositions( pos );
+                }else{
+                    gl::VboMesh::VertexIter itr = vbo->mapVertexBuffer();
+                    for( int i=0; !itr.isDone()&&i<pos.size(); i++ ){
+                        itr.setPosition( pos[i] );
+                        ++itr;
+                    }
                 }
+                bNeedUpdatePos = false;
             }
-            bNeedUpdatePos = false;
         }
     }
     
     void updateVboCol(){
-        if( bNeedUpdateCol && vbo ){
-            
-            if( lay.hasStaticColorsRGBA() ) {
-                vbo->bufferColorsRGBA( col );
-            }else{
-                gl::VboMesh::VertexIter itr = vbo->mapVertexBuffer();
-                for( int i=0; !itr.isDone()&&i<col.size(); i++ ){
-                    itr.setColorRGBA( col[i] );
-                    ++itr;
+        if(bUseVbo){
+            if( bNeedUpdateCol && vbo ){
+                
+                if( lay.hasStaticColorsRGBA() ) {
+                    vbo->bufferColorsRGBA( col );
+                }else{
+                    gl::VboMesh::VertexIter itr = vbo->mapVertexBuffer();
+                    for( int i=0; !itr.isDone()&&i<col.size(); i++ ){
+                        itr.setColorRGBA( col[i] );
+                        ++itr;
+                    }
                 }
+                bNeedUpdateCol = false;
             }
-            bNeedUpdateCol = false;
         }
     }
     
     void updateVboInd(){
-        if( bNeedUpdateInd && vbo ){
-            vbo->bufferIndices( ind );
-            bNeedUpdateInd = false;
+        if(bUseVbo){
+            if( bNeedUpdateInd && vbo ){
+                vbo->bufferIndices( ind );
+                bNeedUpdateInd = false;
+            }
         }
     }
     
     void draw(){
-        if(vbo) gl::draw( vbo );
+        
+        if(bUseVbo){
+            if(vbo){
+                gl::draw( vbo );
+                //vbo->unbindBuffers();
+            }
+        }else{
+            glBegin( primitiveType );
+            for( int i=0; i<pos.size(); i++ ){
+                glColor4f(col[i]);
+                glVertex3f(pos[i]);
+            }
+            glEnd();
+        }
     }
     
     // does not work
@@ -117,7 +144,7 @@ public:
         resetPos();
         resetCol();
         resetInd();
-        vbo.reset();
+        vbo->reset();
     }
     
     void resetPos(){
